@@ -1,11 +1,22 @@
-const processArg = process.argv.slice(2);
-
 const request = require('request');
-request(`https://api.thecatapi.com/v1/breeds/search?q=${processArg}`, (error, response, body) => {
-    console.error("The link you are looking for does not exist");
-    const data = JSON.parse(body);
-    if (data === undefined) {
-        console.log("The breed you are looking for does not exist");
+
+
+const fetchBreedDescription = (breedName, callback) => {
+  request(`https://api.thecatapi.com/v1/breeds/search?q=${breedName}`, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+      return;
     }
-    console.log(data[0].description);
-})
+    const data = JSON.parse(body);
+    if (data.length === 0) {
+      callback("You did not choose a valid cat breed", null)
+      return;
+    }
+    callback(null, data[0].description)
+    return
+  })
+}
+
+module.exports = {
+  fetchBreedDescription
+}
